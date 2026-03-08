@@ -32,8 +32,8 @@ function putOrder(req, res) {
     res.json({ message: 'Order updated' });
 }
 
-function deleteOrder(req, res) {
-    const success = orderService.deleteOrder(req.params.id);
+async function deleteOrder(req, res) {
+    const success = await orderService.deleteOrder(req.params.id);
 
     if (!success) {
         return res.status(404).json({

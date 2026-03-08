@@ -63,8 +63,8 @@ function putOrder(id, data) {
     return result.rows[0] || null;
 }
 
-function deleteOrder(id) {
-    const result  = db.query(
+async function deleteOrder(id) {
+    const result = await db.query(
         'DELETE FROM orders WHERE orderId = $1',
         [id]
     );
