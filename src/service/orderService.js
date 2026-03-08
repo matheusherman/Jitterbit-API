@@ -35,8 +35,8 @@ function putOrder(id, data) {
     return repository.putOrder(id, data);
 }
 
-function deleteOrder(id) {
-    return repository.deleteOrder(id);
+async function deleteOrder(id) {
+    return await repository.deleteOrder(id);
 }
 
 function mapOrder(data) {
