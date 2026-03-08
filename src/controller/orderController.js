@@ -2,7 +2,7 @@ const orderService = require('../service/orderService');
 
 function createOrder(req, res) {
     orderService.create(req.body);
-    res.json({ message: 'Order created' }); // retorna 200 independente
+    res.status(201).json(order);
 }
 
 function getOrder(req, res) {
@@ -17,7 +17,7 @@ function getOrder(req, res) {
     res.json({ message: 'Order details', order });
 }
     
-function getAllOrders(req, res) {
+function getAllOrders(res) {
     const orders = orderService.getAll();
     res.json({ message: 'List of all orders', orders });
 }
