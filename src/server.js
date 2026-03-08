@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const orderRoutes = require('./routes/orderRoutes');
 

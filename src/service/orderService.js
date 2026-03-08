@@ -1,53 +1,56 @@
-const Order = require('../model/order');
-
-const orders = []
+const repository = require('../repository/orderRepository');
 
 function create(data) {
-    const { orderId, value, creationDate } = data;
-
-    const order = new Order(orderId, value, creationDate);
-    orders.push(order);
-
-    return order;
+    const order = mapOrder(data);
+    return repository.create(order);
 }
 
 function getOrder(id) {
-    return orders.find(order => order.orderId === id);
+    return repository.getOrder(id);
 }
 
 function getAll() {
-    return orders;
+    return repository.getAll();
 }
 
-function updateOrder(id, data) {
-    const order = getOrder(id);
+function patchOrder(id, data) {
+
+    const order = repository.getOrder(id);
 
     if (!order) {
         return null;
     }
 
-    const { value, creationDate } = data;
+    return repository.patchOrder(id, data);
+}
 
-    if (value !== undefined) {
-        order.value = value;
+function putOrder(id, data) {
+
+    const order = repository.getOrder(id);
+
+    if (!order) {
+        return null;
     }
 
-    if (creationDate !== undefined) {
-        order.creationDate = creationDate;
-    }
-
-    return order;
+    return repository.putOrder(id, data);
 }
 
 function deleteOrder(id) {
-    const index = orders.findIndex(order => order.orderId === id);
+    return repository.deleteOrder(id);
+}
 
-    if (index === -1) {
-        return false;
-    }
+function mapOrder(data) {
 
-    orders.splice(index, 1);
-    return true;
+    return {
+        orderId: data.numeroPedido,
+        value: data.valorTotal,
+        creationDate: new Date(data.dataCriacao),
+        items: data.items.map(i => ({
+            productId: Number(i.idItem),
+            quantity: i.quantidadeItem,
+            price: i.valorItem
+        }))
+    };
 }
 
 
@@ -55,6 +58,7 @@ module.exports = {
     create,
     getOrder,
     getAll,
-    updateOrder,
+    patchOrder,
+    putOrder,
     deleteOrder
 };
