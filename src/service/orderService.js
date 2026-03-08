@@ -1,38 +1,36 @@
 const repository = require('../repository/orderRepository');
 
-function create(data) {
+async function create(data) {
     const order = mapOrder(data);
-    return repository.create(order);
+    return await repository.create(order);
 }
 
-function getOrder(id) {
-    return repository.getOrder(id);
+async function getOrder(id) {
+    return await repository.getOrder(id);
 }
 
-function getAll() {
-    return repository.getAll();
+async function getAll() {
+    return await repository.getAll();
 }
 
-function patchOrder(id, data) {
-
-    const order = repository.getOrder(id);
+async function patchOrder(id, data) {
+    const order = await repository.getOrder(id);
 
     if (!order) {
         return null;
     }
 
-    return repository.patchOrder(id, data);
+    return await repository.patchOrder(id, data);
 }
 
-function putOrder(id, data) {
-
-    const order = repository.getOrder(id);
+async function putOrder(id, data) {
+    const order = await repository.getOrder(id);
 
     if (!order) {
         return null;
     }
 
-    return repository.putOrder(id, data);
+    return await repository.putOrder(id, data);
 }
 
 async function deleteOrder(id) {
@@ -52,7 +50,6 @@ function mapOrder(data) {
         }))
     };
 }
-
 
 module.exports = {
     create,
