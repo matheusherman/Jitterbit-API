@@ -1,10 +1,9 @@
 const db = require('../database/db');
 
-function create(order) {
-
+async function create(order) {
     const { orderId, value, creationDate } = order;
 
-    db.query(
+    await db.query(
         'INSERT INTO orders (orderId,value,creationDate) VALUES ($1,$2,$3)',
         [orderId, value, creationDate]
     );
@@ -12,8 +11,8 @@ function create(order) {
     return order;
 }
 
-function getOrder(id) {
-    const result = db.query(
+async function getOrder(id) {
+    const result = await db.query(
         'SELECT * FROM orders WHERE orderId = $1',
         [id]
     );
@@ -21,13 +20,13 @@ function getOrder(id) {
     return result.rows[0] || null;
 }
 
-function getAll() {
-    const result = db.query('SELECT * FROM orders');
+async function getAll() {
+    const result = await db.query('SELECT * FROM orders');
+
     return result.rows;
 }
 
-function patchOrder(id, data) {
-
+async function patchOrder(id, data) {
     const fields = [];
     const values = [];
     let index = 1;
@@ -42,9 +41,13 @@ function patchOrder(id, data) {
         values.push(data.creationDate);
     }
 
+    if (fields.length === 0) {
+        return null;
+    }
+
     values.push(id);
 
-    const result = db.query(
+    const result = await db.query(
         `UPDATE orders SET ${fields.join(', ')} WHERE orderId = $${index} RETURNING *`,
         values
     );
@@ -52,11 +55,11 @@ function patchOrder(id, data) {
     return result.rows[0] || null;
 }
 
-function putOrder(id, data) {
+async function putOrder(id, data) {
     const { value, creationDate } = data;
 
-    db.query(
-        'UPDATE orders SET value = $1, creationDate = $2 WHERE orderId = $3',
+    const result = await db.query(
+        'UPDATE orders SET value = $1, creationDate = $2 WHERE orderId = $3 RETURNING *',
         [value, creationDate, id]
     );
 
@@ -70,7 +73,7 @@ async function deleteOrder(id) {
     );
 
     return result.rowCount > 0;
-}   
+}
 
 module.exports = {
     create,

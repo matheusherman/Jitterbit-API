@@ -1,46 +1,64 @@
 const repository = require('../repository/orderRepository');
+const NotFoundError = require('../error/NotFoundError');
 
-function create(data) {
+async function create(data) {
     const order = mapOrder(data);
     return repository.create(order);
 }
 
-function getOrder(id) {
-    return repository.getOrder(id);
+async function getOrder(id) {
+    const order = await repository.getOrder(id);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
-function getAll() {
+async function getAll() {
     return repository.getAll();
 }
 
-function patchOrder(id, data) {
-
-    const order = repository.getOrder(id);
-
-    if (!order) {
-        return null;
+async function patchOrder(id, data) {
+    if (!data || Object.keys(data).length === 0) {
+        throw new BadRequestError('No fields provided for update');
     }
 
-    return repository.patchOrder(id, data);
+    const order = await repository.patchOrder(id, data);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
-function putOrder(id, data) {
-
-    const order = repository.getOrder(id);
-
-    if (!order) {
-        return null;
+async function putOrder(id, data) {
+    if (data.value === undefined || data.creationDate === undefined) {
+        throw new BadRequestError('value and creationDate are required');
     }
 
-    return repository.putOrder(id, data);
+    const order = await repository.putOrder(id, data);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
 async function deleteOrder(id) {
-    return await repository.deleteOrder(id);
+    const success = await repository.deleteOrder(id);
+
+    if (!success) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return true;
 }
 
 function mapOrder(data) {
-
     return {
         orderId: data.numeroPedido,
         value: data.valorTotal,
@@ -52,7 +70,6 @@ function mapOrder(data) {
         }))
     };
 }
-
 
 module.exports = {
     create,
