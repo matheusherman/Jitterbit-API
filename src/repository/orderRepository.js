@@ -2,11 +2,28 @@ const db = require('../database/db');
 
 async function create(order) {
     const { orderId, value, creationDate } = order;
+    const items = order.items || [];
 
-    await db.query(
-        'INSERT INTO orders (orderId,value,creationDate) VALUES ($1,$2,$3)',
-        [orderId, value, creationDate]
-    );
+    try {
+        await db.query('BEGIN');
+
+        await db.query(
+            'INSERT INTO orders (orderId,value,creationDate) VALUES ($1,$2,$3)',
+            [orderId, value, creationDate]
+        );
+
+        for (const item of items) {
+            await db.query(
+                'INSERT INTO items (orderId, productId, quantity, price) VALUES ($1, $2, $3, $4)',
+                [orderId, item.productId, item.quantity, item.price]
+            );
+        }
+
+        await db.query('COMMIT');
+    } catch (error) {
+        await db.query('ROLLBACK');
+        throw error;
+    }
 
     return order;
 }
