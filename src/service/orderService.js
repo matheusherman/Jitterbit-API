@@ -1,44 +1,64 @@
 const repository = require('../repository/orderRepository');
+const NotFoundError = require('../error/NotFoundError');
 
 async function create(data) {
     const order = mapOrder(data);
-    return await repository.create(order);
+    return repository.create(order);
 }
 
 async function getOrder(id) {
-    return await repository.getOrder(id);
+    const order = await repository.getOrder(id);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
 async function getAll() {
-    return await repository.getAll();
+    return repository.getAll();
 }
 
 async function patchOrder(id, data) {
-    const order = await repository.getOrder(id);
-
-    if (!order) {
-        return null;
+    if (!data || Object.keys(data).length === 0) {
+        throw new BadRequestError('No fields provided for update');
     }
 
-    return await repository.patchOrder(id, data);
+    const order = await repository.patchOrder(id, data);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
 async function putOrder(id, data) {
-    const order = await repository.getOrder(id);
-
-    if (!order) {
-        return null;
+    if (data.value === undefined || data.creationDate === undefined) {
+        throw new BadRequestError('value and creationDate are required');
     }
 
-    return await repository.putOrder(id, data);
+    const order = await repository.putOrder(id, data);
+
+    if (!order) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return order;
 }
 
 async function deleteOrder(id) {
-    return await repository.deleteOrder(id);
+    const success = await repository.deleteOrder(id);
+
+    if (!success) {
+        throw new NotFoundError('Order not found');
+    }
+
+    return true;
 }
 
 function mapOrder(data) {
-
     return {
         orderId: data.numeroPedido,
         value: data.valorTotal,

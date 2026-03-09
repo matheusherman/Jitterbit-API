@@ -1,65 +1,57 @@
 const orderService = require('../service/orderService');
 
-async function createOrder(req, res) {
-    const order = await orderService.create(req.body);
-    res.status(201).json(order);
-}
-
-async function getOrder(req, res) {
-    const order = await orderService.getOrder(req.params.id);
-    
-    if (!order) {
-        return res.status(404).json({
-            message: 'Order not found'
-        });
+async function createOrder(req, res, next) {
+    try {
+        const order = await orderService.create(req.body);
+        res.status(201).json({ data: order });
+    } catch (err) {
+        next(err);
     }
-
-    res.json(order);
 }
 
-async function getAllOrders(req, res) {
-    const orders = await orderService.getAll();
-
-    res.json({
-        message: 'List of all orders',
-        orders
-    });
-}
-
-async function patchOrder(req, res) {
-    const order = await orderService.patchOrder(req.params.id, req.body);
-
-    if (!order) {
-        return res.status(404).json({
-            message: 'Order not found'
-        });
+async function getOrder(req, res, next) {
+    try {
+        const order = await orderService.getOrder(req.params.id);
+        res.json({ data: order });
+    } catch (err) {
+        next(err);
     }
-
-    res.json(order);
 }
 
-async function putOrder(req, res) {
-    const order = await orderService.putOrder(req.params.id, req.body);
-
-    if (!order) {
-        return res.status(404).json({
-            message: 'Order not found'
-        });
+async function getAllOrders(req, res, next) {
+    try {
+        const orders = await orderService.getAll();
+        res.json({ data: orders });
+    } catch (err) {
+        next(err);
     }
-
-    res.json(order);
 }
 
-async function deleteOrder(req, res) {
-    const success = await orderService.deleteOrder(req.params.id);
-
-    if (!success) {
-        return res.status(404).json({
-            message: "Order not found"
-        });
+async function patchOrder(req, res, next) {
+    try {
+        const order = await orderService.patchOrder(req.params.id, req.body);
+        res.json({ data: order });
+    } catch (err) {
+        next(err);
     }
+}
 
-    res.status(204).send();
+async function putOrder(req, res, next) {
+    try {
+        const order = await orderService.putOrder(req.params.id, req.body);
+        res.json({ data: order });
+    } catch (err) {
+        next(err);
+    }
+}
+
+async function deleteOrder(req, res, next) {
+    try {
+        await orderService.deleteOrder(req.params.id);
+        res.status(204).send();
+    } catch (err) {
+        next(err);
+    }
 }
 
 module.exports = {
